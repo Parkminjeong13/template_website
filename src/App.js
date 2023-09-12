@@ -5,8 +5,25 @@ import Aside from "./components/Aside";
 import { ThemeProvider } from "styled-components";
 import { useState } from "react";
 import Nav from "./components/Nav";
+import store from "./store";
+import { Provider, useSelector } from "react-redux";
 
 function App() {
+  
+
+
+
+
+  return (
+    <>
+      <Provider store={store}>
+        <Inner />
+      </Provider>
+    </>
+  );
+}
+
+function Inner(){
   const light = {
     colors: {
       Primary : "orange",
@@ -26,28 +43,22 @@ function App() {
     }
   }
   
-  const [themeConfig, setThemeConfig] = useState("light");
-  const DarkMode = themeConfig === 'light' ? light : dark;
+  const theme = useSelector(state => state.dark);
+  const DarkMode = theme === 'light' ? light : dark;
 
-  const ThemeSelect = ()=>{
-    setThemeConfig(themeConfig === 'light' ? 'dark' : 'light')
-  }
-
-
-
-
+  
   return (
-    <>
-      <ThemeProvider theme={DarkMode}>
-        <GlobalStyle/>
-        <Aside ThemeSelect={ThemeSelect} themeConfig={themeConfig}/>
-        <Nav/>
-        <Routes>
-          <Route path="/" element={<Main/>}></Route>
-        </Routes>
-      </ThemeProvider>
-    </>
-  );
+    <ThemeProvider theme={DarkMode}>
+      {theme}
+      <GlobalStyle/>
+      <Aside />
+      <Nav/>
+      <Routes>
+        <Route path="/" element={<Main/>}></Route>
+      </Routes>
+    </ThemeProvider>
+  )
 }
+
 
 export default App;
