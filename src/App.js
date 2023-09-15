@@ -9,6 +9,7 @@ import store from "./store";
 import { Provider, useSelector } from "react-redux";
 import Member from "./pages/Member";
 import Login from "./pages/Login";
+import Example from "./example/Example";
 
 function App() {
   
@@ -55,7 +56,8 @@ function Inner(){
       <Aside />
       <Nav/>
       <Routes>
-        <Route path="/" element={<Main/>}></Route>
+        {/* <Route path="/" element={<Main/>}></Route> */}
+        <Route path="/" element={<Example/>}></Route>
         <Route path="/member" element={<Member/>}></Route>
         <Route path="/login" element={<Login/>}></Route>
       </Routes>
