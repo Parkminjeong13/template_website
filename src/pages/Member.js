@@ -165,7 +165,7 @@ function Member() {
     <>
         {
             isModal &&
-            <Modal error={error} />
+            <Modal error={error} onClose={() => {setIsModal(false)}} />
         }
         <Container>
             <SignUp>

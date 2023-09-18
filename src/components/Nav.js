@@ -142,8 +142,8 @@ const MsubmenuMember = styled(NavMember)`
 `
 
 
-function Nav() {
-
+function Nav({userState2}) {
+    // const userState = useSelector(state => state.user);
     const [isHeight, setIsHeight] = useState();
     const SubMenuHeight = (e) =>{
         const list = document.querySelectorAll(".sub_list")[e];
@@ -297,8 +297,8 @@ function Nav() {
                 <NavMember>
                     <ul>
                         <li>
-                            <NavLink to="/login">
-                                <FontAwesomeIcon icon={faLock}></FontAwesomeIcon> 로그인
+                            <NavLink to={userState2.data?.nickname ? "/logout" : "/login"}>
+                                <FontAwesomeIcon icon={faLock}></FontAwesomeIcon> {userState2.data?.nickname ? "로그아웃" : "로그인"}
                             </NavLink>
                         </li>
                         <li>

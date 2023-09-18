@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import {firebaseAuth, signInWithEmailAndPassword} from './../firebase'
 import { useNavigate } from 'react-router-dom'
+import { collection, doc, getDoc, getFirestore } from 'firebase/firestore'
+import { useDispatch } from 'react-redux'
+import { logIn, loggedIn } from './../store'
 // import {useHistory} from 'react-router-dom';
 
 
@@ -74,7 +77,8 @@ function Login() {
     const [password, setPassword] = useState();
     const [error, setError] = useState();
     // const history = useHistory();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const errorMsg = (errorCode) =>{
         const firebaseError = {
@@ -92,6 +96,17 @@ function Login() {
             // console.log(userLogin)
             const user = userLogin.user;
             console.log(user)
+            sessionStorage.setItem("users", user.uid)
+            dispatch(logIn(user.uid));
+
+            const userDoc = doc(collection(getFirestore(), "users"), user.uid);
+            const userDocSnapshot = await getDoc(userDoc)
+            if(userDocSnapshot.exists()){
+                const userData = userDocSnapshot.data();
+                console.log(userData)
+                dispatch(loggedIn(userData));
+                navigate(-1);
+            }
         }catch(error){
             setError(errorMsg(error.code));
             console.log(error.code)

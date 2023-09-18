@@ -37,15 +37,15 @@ const Button = styled.button`
     color: #fff; cursor: pointer;
 `
 
-function Modal(props) {
+function Modal({error, onClose}) {
   return (
     <>
         {
             <ModalBackground>
                 <ModalContent>
                     <FontAwesomeIcon icon={faTriangleExclamation} />
-                    <p>{props.error}</p>
-                    <Button>확인</Button>
+                    <p>{error}</p>
+                    <Button onClick={onClose}>확인</Button>
                 </ModalContent>
             </ModalBackground>
         }
