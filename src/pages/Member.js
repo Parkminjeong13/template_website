@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { logIn } from '../store';
 
 
 
@@ -66,11 +68,14 @@ function Member() {
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
     const [nickname, setNickname] = useState("");
-    const [phone, setPhone] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [error, setError] = useState("");
     const [eye, setEye] = useState([0,0]);
     const [isModal, setIsModal] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const userState = useSelector(state => state.user);
+    console.log(userState.loggedIn)
 
     const toggleEye = (index) =>{
         const newEye = [...eye];
@@ -86,7 +91,7 @@ function Member() {
         let value = e.target.value;
         e.target.value = e.target.value.replace(/[^0-9]/g, '').replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3").replace(/-{1,2}$/g, "");
 
-        setPhone(value);
+        setPhoneNumber(value);
     }
 
     const errorMsg = (errorCode) =>{
@@ -99,9 +104,9 @@ function Member() {
         }
         return firebaseError[errorCode] || '알 수 없는 에러가 발생했습니다.'
     }
-    const isValidPhone = (phone) =>{
+    const isValidPhone = (phoneNumber) =>{
         const regex = /^01[0-9]-[0-9]{3,4}-[0-9]{4}$/;
-        return regex.test(phone)
+        return regex.test(phoneNumber)
     }
     const isValidEmail = (email) =>{
         const regex = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/
@@ -110,14 +115,14 @@ function Member() {
 
     const signUp = async (e) =>{
         e.preventDefault();
-
+         
         let errorMessage = "";
         
         if(name.length === 0){
             errorMessage = "이름";
         }else if(nickname.length === 0){
             errorMessage = "닉네임";
-        }else if(!isValidPhone(phone)){
+        }else if(!isValidPhone(phoneNumber)){
             setError("유효한 전화번호를 입력해주세요");
             setIsModal(!isModal)
             return;
@@ -147,10 +152,14 @@ function Member() {
             const userProfile = {
                 name,
                 nickname,
-                phone
+                phoneNumber,
+                email
             }
 
             await setDoc(doc(getFirestore(), "users", user.uid), userProfile)
+
+            sessionStorage.setItem("users", user.uid)
+            dispatch(logIn(user.uid));
 
             alert("회원가입이 완료 되었습니다.")
             navigate('/');
@@ -167,6 +176,8 @@ function Member() {
             isModal &&
             <Modal error={error} onClose={() => {setIsModal(false)}} />
         }
+        {
+            userState.loggedIn ? <Modal error="이미 로그인 중입니다." onClose={()=>{navigate('/')}}/> :
         <Container>
             <SignUp>
                 <Title>회원가입</Title>                
@@ -189,6 +200,7 @@ function Member() {
                 <Button onClick={signUp}>가입</Button>
             </SignUp>
         </Container>
+        }
     </>
   )
 }

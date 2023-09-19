@@ -1,4 +1,4 @@
-import { faArrowRightFromBracket, faLock, faUser, faChevronDown } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRightFromBracket, faLock, faUser, faChevronDown, faUserPen } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
@@ -301,11 +301,20 @@ function Nav({userState2}) {
                                 <FontAwesomeIcon icon={faLock}></FontAwesomeIcon> {userState2.data?.nickname ? "로그아웃" : "로그인"}
                             </NavLink>
                         </li>
-                        <li>
+                        {
+                            userState2.data?.nickname ? 
+                            <li>
+                            <NavLink to="/modify">
+                                <FontAwesomeIcon icon={faUserPen}></FontAwesomeIcon> 정보수정
+                            </NavLink>
+                            </li>
+                            :
+                            <li>
                             <NavLink to="/member">
                                 <FontAwesomeIcon icon={faUser}></FontAwesomeIcon> 회원가입
                             </NavLink>
-                        </li>
+                            </li>
+                        }
                     </ul>
                 </NavMember>
             </NavWrap>
