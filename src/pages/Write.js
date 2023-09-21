@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components';
 import Ckeditor from '../components/Ckeditor';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useSelector } from 'react-redux';
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
 
 
 
@@ -40,19 +41,6 @@ const Heading = styled.h3`
     top: -6px;
     left: 0;
     border-radius: 2px;
-  }
-`;
-
-const UploadButton = styled.button`
-  height: 30px;
-  background-color: #c6c6c6;
-  color: white;
-  border-radius: 5px;
-  padding: 2px 10px;
-  font-size: 13px;
-
-  &:hover {
-    background-color: #2ed090;
   }
 `;
 
@@ -97,13 +85,34 @@ const ContentLabel = styled.p`
 function Write() {
 
   const [textTitle, setTextTitle] = useState("");
-  const {board} = useParams()
+  const {board, view} = useParams()
   
   const boards = ["notice", "online", "qna", "gallery"];
-  const [isModal, setIsModal] = useState(true);
+  const [isModal, setIsModal] = useState(view ? false : true);
   const navigate = useNavigate();
   const memberProfile = useSelector(state => state.user);
-  console.log(memberProfile)
+  
+  const [postData, setPostData] = useState(null);
+  const [message, setMessage] = useState("");
+
+  useEffect(()=>{
+    if(board && view){
+      const fetchData = async () => {
+        const postRef = doc(getFirestore(), board, view);
+        const postSnapShot = await getDoc(postRef);
+        if(postSnapShot.exists()){
+          setIsModal(false)
+          setPostData(postSnapShot.data())
+          setTextTitle(postSnapShot.data().title)
+        }else{
+          setIsModal(true)
+          setMessage("해당 문서가 존재하지 않습니다.")
+        }
+      }
+    fetchData()
+    }
+  },[board, view])
+
   if(!memberProfile.loggedIn){
     return (
       <>
@@ -125,25 +134,30 @@ function Write() {
 
 
   return (
-    <Container>
-      <InnerContainer>
-        <Header>
-          <Heading>글쓰기</Heading>
-          <UploadButton>등록하기</UploadButton>
-        </Header>
+    <>
+      {
+        isModal && view && <Modal error={message} onClose={()=>{setIsModal(false); navigate(`/service/${board}`)}} />
+      }
+      <Container>
+        <InnerContainer>
+          <Header>
+            <Heading>{board && view ? "글수정" : "글쓰기"}</Heading>
+            
+          </Header>
 
-        <ContentWrapper>
-          <ContentInner>
-            <Title>제목</Title>
-            <TextInput type="text" onChange={(e)=>{setTextTitle(e.target.value)}} />
-          </ContentInner>
-          <ContentInputWrapper>
-            <ContentLabel>내용</ContentLabel>
-            <Ckeditor title={textTitle}/>
-          </ContentInputWrapper>
-        </ContentWrapper>
-      </InnerContainer>
-    </Container>
+          <ContentWrapper>
+            <ContentInner>
+              <Title>제목</Title>
+              <TextInput defaultValue={postData && postData.title} type="text" onChange={(e)=>{setTextTitle(e.target.value)}} />
+            </ContentInner>
+            <ContentInputWrapper>
+              <ContentLabel>내용</ContentLabel>
+              <Ckeditor postData={postData} title={textTitle}/>
+            </ContentInputWrapper>
+          </ContentWrapper>
+        </InnerContainer>
+      </Container>
+    </>
   );
 }
 
