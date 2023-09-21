@@ -64,26 +64,27 @@ function Inner(){
   const theme = useSelector(state => state.dark);
   const DarkMode = theme === 'light' ? light : dark;
   const userState = useSelector(state => state.user);
-  console.log(userState)
+  // console.log(userState)
 
   const dispatch = useDispatch();
   const uid = sessionStorage.getItem("users");
-  console.log(uid)
-  if(uid){
-    dispatch(logIn(uid));
-  }
-
+  // console.log(uid)
+  
   useEffect(()=>{
+    
+    if(uid){
+      dispatch(logIn(uid));
+    }
 
     const fetchUser = async () => {
       if(!uid) return;
 
       const userDoc = doc(collection(getFirestore(),"users"), uid);
-      console.log(userDoc)
+      // console.log(userDoc)
 
       try{
         const docSnapshot = await getDoc(userDoc);
-        console.log(docSnapshot)
+        // console.log(docSnapshot)
         if(docSnapshot.exists()){
           const userData = docSnapshot.data();
           dispatch(loggedIn(userData))
@@ -115,7 +116,7 @@ function Inner(){
         <Route path="/findemail" element={<Findemail/>}></Route>
         <Route path="/write/:board" element={<Write/>}></Route>
         <Route path="/view/:board/:view" element={<View/>}></Route>
-        <Route path="/view/:board" element={isModal && <Modal error="유효하지 않은 경로입니다." onClose={()=>{navigate('/')}}/>} ></Route>
+        
         <Route path="/edit/:board/:view" element={<Write/>}></Route>
         <Route path="/service" element={<Service/>}>
           <Route path="notice" element={<Notice/>}></Route>

@@ -7,6 +7,7 @@ import { deleteDoc, doc, getDoc, getFirestore, increment, updateDoc } from 'fire
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faList, faPen, faPenSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useSelector } from 'react-redux';
 
 
 const Container = styled.div`
@@ -71,6 +72,7 @@ function View() {
     const navigate = useNavigate();
     const [post, setPost] = useState();
     const [message, setMessage] = useState("");
+    const memberProfile = useSelector(state => state.user);
     const viewCnt = async(board, view) =>{
         const viewRef = doc(getFirestore(), board, view);
         await updateDoc(viewRef,{
@@ -84,11 +86,11 @@ function View() {
             const postSnapShot = await getDoc(postRef);
             if(postSnapShot.exists()){
                 setPost(postSnapShot.data())
+                viewCnt(board, view)
             }else{
                 setIsModal(true)
                 setMessage("해당 문서가 존재하지 않습니다.")
             }
-            viewCnt(board, view)
         }
         fetchData()
     },[board,view])
@@ -113,7 +115,7 @@ function View() {
     }
     if(isModal){
         return (
-            <Modal error={message} onClose={()=>{setIsModal(false);}} />
+            <Modal error={message} onClose={()=>{setIsModal(false); navigate(`/service/${board}`)}} />
         )
     }
     if(!post){
@@ -121,7 +123,8 @@ function View() {
             <div>로딩중</div>
         )
     }
-
+    
+    
   return (
     <>
         <Container>
@@ -140,10 +143,12 @@ function View() {
                         <Button onClick={()=>{navigate(`/service/${board}`)}}><FontAwesomeIcon icon={faList} />목록</Button>
                         <Button onClick={()=>{navigate(`/write/${board}`)}}><FontAwesomeIcon icon={faPen} />글쓰기</Button>
                     </ButtonWrap>
+                    {post.uid === memberProfile.uid && 
                     <ButtonWrap>
                         <Button onClick={()=>{navigate(`/edit/${board}/${view}`)}}><FontAwesomeIcon icon={faPenSquare} />수정</Button>
                         <Button onClick={deletePost}><FontAwesomeIcon icon={faTrash} />삭제</Button>
                     </ButtonWrap>
+                    }
                 </ButtonContent>
             </ContentWrap>
         </Container>
