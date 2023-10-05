@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Product from './Product'
 import { useMemo } from 'react'
 import Banner from '../components/home/Banner'
+import Company from '../components/home/Company'
 
 
 
@@ -32,6 +33,7 @@ function Main() {
   return (
     <>
       <Banner />
+      <Company />
       {/* {result}
       <p>{count}</p>
       <Product />
